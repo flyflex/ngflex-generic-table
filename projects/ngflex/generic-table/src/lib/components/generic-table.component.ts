@@ -10,6 +10,7 @@ import { Moment } from 'moment';
 
 import { LayoutService } from '../services/layout.service';
 import { NgFlexHelpers } from '../helpers/ng-flex.helpers';
+import { TableColumn } from '../models/table-column.model';
 
 @Component({
   selector: 'ng-flex-table',
@@ -23,7 +24,7 @@ export class NgFlexGenericTableComponent implements OnChanges {
 
   @Input() public entities: any[]; // async
   @Input() public loading: boolean; // async
-  @Input() public cols: any[];
+  @Input() public cols: TableColumn[];
 
   @Input() public isSelectable: boolean = false;
   @Input() public smallActionColumn: boolean = false;

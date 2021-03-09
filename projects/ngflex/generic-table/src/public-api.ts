@@ -5,4 +5,5 @@
 export * from './lib/components/generic-table.component';
 export * from './lib/services/layout.service';
 export * from './lib/helpers/ng-flex.helpers';
+export * from './lib/models/table-column.model';
 export * from './lib/generic-table.module';
