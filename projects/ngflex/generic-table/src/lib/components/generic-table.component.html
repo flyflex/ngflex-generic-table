@@ -1,0 +1,150 @@
+<div class="toolbar">
+  <div class="toolbar__subtitle">
+    <ng-content select="toolbar-subtitle"></ng-content>
+  </div>
+  <div class="toolbar__actions">
+    <ng-container *ngTemplateOutlet="toolbarActionButtonsTemplate">
+    </ng-container>
+  </div>
+
+  <div class="toolbar__filter">
+    <div class="filter__form">
+      <mat-form-field class="form__search">
+        <mat-icon matPrefix>search</mat-icon>
+        <input type="text" class="search-input" matInput [(ngModel)]="filter"
+          [placeholder]="translatePrefix + '.filter' | translate"
+          (keyup)="applyFilter($event.target.value)">
+      </mat-form-field>
+    </div>
+
+    <ng-container *ngTemplateOutlet="filterActionButtonsTemplate">
+    </ng-container>
+  </div>
+</div>
+
+<div class="ng-flex-table" *ngIf="entities">
+  <table class="ng-flex-table__table" mat-table *ngIf="!!dataSource?.data" [dataSource]="dataSource" matSort>
+    <ng-container matColumnDef="select" *ngIf="isSelectable">
+      <th mat-header-cell *matHeaderCellDef>
+        <mat-checkbox (change)="$event ? masterToggle() : null"
+          [checked]="selection.hasValue() && isAllSelected()"
+          [indeterminate]="selection.hasValue() && !isAllSelected()">
+        </mat-checkbox>
+      </th>
+      <td mat-cell *matCellDef="let row">
+        <mat-checkbox (click)="$event.stopPropagation()"
+          (change)="$event ? selection.toggle(row) : null"
+          [checked]="selection.isSelected(row)">
+        </mat-checkbox>
+      </td>
+    </ng-container>
+
+    <ng-container *ngFor="let col of cols" matColumnDef="{{ col.field }}">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header
+        [class.small-column]="col.smallColumn"
+        [class.hide]="col.hideOnSmall && mobileQuery?.matches"
+        [style.width]="col.width"
+      >
+        <ng-container *ngIf="!col.hideLabel">
+          {{ translatePrefix + '.' + col.header | translate }}
+        </ng-container>
+      </th>
+      <td mat-cell *matCellDef="let row"
+        [class.small-column]="col.smallColumn"
+        [class.hide]="col.hideOnSmall && mobileQuery?.matches"
+        [style.width]="col.width"
+      >
+        <ng-container [ngSwitch]="col.type">
+          <ng-container *ngSwitchCase="'image'">
+            <img [src]="accessObjectValue(row, col.field)"
+              [ngClass]="col.imageClass"
+              [matTooltip]="accessObjectValue(row, col.field)"
+              matTooltipClass="tooltip-bottom"
+            >
+          </ng-container>
+
+          <ng-container *ngSwitchCase="'date'">
+            <span
+              [matTooltip]="toDate(accessObjectValue(row, col.field))"
+              matTooltipClass="tooltip-bottom"
+            >
+              {{ toDate(accessObjectValue(row, col.field), col.format) }}
+            </span>
+          </ng-container>
+
+          <ng-container *ngSwitchCase="'tag'">
+            <mat-chip-list>
+              <mat-chip class="value-chip" selected
+              [style.backgroundColor]="accessObjectValue(row, col.color)"
+              (click)="onTagClick(accessObjectValue(row, col.field))"
+              >
+                <span
+                [matTooltip]="accessObjectValue(row, col.field) || accessObjectValue(row, col.alternateField)"
+                matTooltipClass="tooltip-bottom"
+              >
+                {{ accessObjectValue(row, col.field) || accessObjectValue(row, col.alternateField) }}
+              </span>
+              </mat-chip>
+            </mat-chip-list>
+          </ng-container>
+
+          <ng-container *ngSwitchCase="'boolean'">
+            <mat-icon *ngIf="accessObjectValue(row, col.field, true)">check</mat-icon>
+            <mat-icon *ngIf="!accessObjectValue(row, col.field, true)">close</mat-icon>
+          </ng-container>
+
+          <ng-container *ngSwitchDefault>
+            <span
+              [matTooltip]="
+                accessObjectValue(row, col.tooltipField)
+              "
+              matTooltipClass="tooltip-bottom"
+              [class.has-note]="!!accessObjectValue(row, col.tooltipField)"
+            >
+              {{ accessObjectValue(row, col.field) || accessObjectValue(row, col.alternateField) }}
+              {{ col.currency || '' }}
+            </span>
+          </ng-container>
+        </ng-container>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell
+        *matHeaderCellDef
+        [class.small-column]="smallActionColumn"
+        [class.flex-column]="flexActions"
+      > {{ translatePrefix + '.action' | translate }} </th>
+      <td mat-cell *matCellDef="let row" [class.small-column]="smallActionColumn" [class.flex-column]="flexActions">
+        <ng-container *ngIf="mobileQuery?.matches; else tabletQuery">
+          <button mat-icon-button [matMenuTriggerFor]="actions">
+            <mat-icon>more_vert</mat-icon>
+          </button>
+          <mat-menu #actions="matMenu">
+            <ng-content select="action-items"></ng-content>
+            <ng-container *ngTemplateOutlet="actionMobileListItems; context: { $implicit: row  }">
+            </ng-container>
+          </mat-menu>
+        </ng-container>
+
+        <ng-template #tabletQuery>
+          <ng-content select="action-buttons"></ng-content>
+          <ng-container *ngTemplateOutlet="actionButtonListItems; context: { $implicit: row  }">
+          </ng-container>
+        </ng-template>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>
+
+  <div class="ng-flex-table__empty" *ngIf="!loading && (!dataSource?.data?.length || !dataSource?.filteredData?.length)">
+    {{ translatePrefix + '.noRecord' | translate }}
+  </div>
+  <div class="ng-flex-table--loading" *ngIf="loading">
+    <mat-spinner mode="indeterminate" diameter="50"></mat-spinner>
+  </div>
+
+  <mat-paginator [pageSize]="pageSize" [pageSizeOptions]="[5, 10, 25, 100]"></mat-paginator>
+</div>

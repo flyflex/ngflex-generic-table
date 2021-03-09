@@ -6,5 +6,78 @@
   },
   "newProjectRoot": "projects",
   "projects": {
-  }
+    "@ngflex/generic-table": {
+      "projectType": "library",
+      "root": "projects/ngflex/generic-table",
+      "sourceRoot": "projects/ngflex/generic-table/src",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "options": {
+            "tsConfig": "projects/ngflex/generic-table/tsconfig.lib.json",
+            "project": "projects/ngflex/generic-table/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/ngflex/generic-table/tsconfig.lib.prod.json"
+            }
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "projects/ngflex/generic-table/tsconfig.lib.json",
+              "projects/ngflex/generic-table/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
+    },
+    "toto": {
+      "projectType": "library",
+      "root": "projects/toto",
+      "sourceRoot": "projects/toto/src",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "options": {
+            "tsConfig": "projects/toto/tsconfig.lib.json",
+            "project": "projects/toto/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/toto/tsconfig.lib.prod.json"
+            }
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/toto/src/test.ts",
+            "tsConfig": "projects/toto/tsconfig.spec.json",
+            "karmaConfig": "projects/toto/karma.conf.js"
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "projects/toto/tsconfig.lib.json",
+              "projects/toto/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "defaultProject": "@ngflex/generic-table"
 }
